@@ -237,8 +237,6 @@ jobs:
 
 ---
 
-Souhaites-tu que j'intègre directement cette version complète dans le `.md` ?
-
 ## ⭐ Bonus (Facultatif)
 
 - Ajouter un badge GitHub Actions dans le `README.md`
@@ -247,4 +245,4 @@ Souhaites-tu que j'intègre directement cette version complète dans le `.md` ?
 - Ajouter un slot de préproduction sur Azure
 - Utiliser un environnement GitHub pour déploiement conditionnel
 - Separer en 2 pipeline CI.yml et CD.yml
-- Ajouter un gitleack poru verifier les secrets
+- Ajouter un gitleack pour verifier les secrets
