@@ -83,6 +83,19 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      
+      - name: Smoke test (check Hello World)
+        run: |
+        sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
+        RESPONSE=$(curl -s https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net)
+        echo "Response: $RESPONSE"
+
+        if [[ "$RESPONSE" == *"Hello World!"* ]]; then
+          echo "✅ Déploiement réussi, Hello World trouvé"
+        else
+          echo "❌ Déploiement échoué, Hello World non trouvé"
+          exit 1
+        fi
 
   deploy-as-docker:
     runs-on: ubuntu-latest
