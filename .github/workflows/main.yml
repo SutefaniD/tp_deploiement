@@ -94,8 +94,8 @@ jobs:
             echo "✅ Déploiement réussi, Hello World trouvé"
           else
             echo "❌ Déploiement échoué, Hello World non trouvé"
-          exit 1
-        fi
+            exit 1
+          fi
 
   deploy-as-docker:
     runs-on: ubuntu-latest
