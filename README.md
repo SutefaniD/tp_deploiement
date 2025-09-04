@@ -71,10 +71,6 @@ dotnet run --project MyWebApi/MyWebApi.csproj
 > il se peut que ce ne soit pas aussi facile ;)
 ---
 
-Parfait ! Voici une version mise à jour de la **Partie 3**, plus pédagogique, en proposant aux étudiants d’utiliser un **template GitHub Actions** pour démarrer plus facilement.
-
----
-
 ## 🔐 Partie 3 – Configuration des secrets GitHub & création du pipeline
 
 ### 🔑 Étape 1 – Ajouter les secrets GitHub
@@ -118,16 +114,9 @@ GitHub propose des **modèles de workflow**. Pour créer votre pipeline :
    `https://webapi-votreprenom.azurewebsites.net`
 
 ---
-
-Parfait ! On va donc compléter la **Partie 6** avec un **workflow GitHub Actions** qui :
-
 1. Construit l’image Docker,
 2. La pousse sur Docker Hub,
 3. Déclenche ainsi la mise à jour automatique de la Web App (via le déploiement continu activé sur Azure).
-
----
-
-Voici la **nouvelle version de la Partie 6**, mise à jour avec un `workflow` :
 
 ---
 
