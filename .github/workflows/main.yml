@@ -125,11 +125,13 @@ jobs:
   smoke-test-docker:
     runs-on: ubuntu-latest
     needs: deploy-as-docker
+    env:
+      AZURE_DOCKER_WEBAPP_URL: ${{ secrets.AZURE_DOCKER_WEBAPP_URL }}
     steps:
       - name: Smoke test (check Hello World)
         run: |
           sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
-          RESPONSE=$(curl -s https://${{ secrets.AZURE_DOCKER_WEBAPP_NAME }}.azurewebsites.net)
+          RESPONSE=$(curl -s https://$AZURE_DOCKER_WEBAPP_URL)
           echo "Response: $RESPONSE"
 
           if [[ "$RESPONSE" == *"Hello World!"* ]]; then
