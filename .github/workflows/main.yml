@@ -110,30 +110,30 @@ jobs:
     strategy:
       matrix:
         target: ["binary", "docker"]
+    env:
+      TARGET_TYPE: ${{ matrix.target }}
 
     steps:
-      - name: Determine URL
+      - name: Smoke test (check Hello World)
         run: |
-          if [[ "${{ matrix.target }}" == "binary" ]]; then 
+          # Déterminer l'URL selon le type
+          if [[ $TARGET_TYPE == "binary" ]]; then 
             WEBAPP_URL="${{ needs.deploy-as-binary.outputs.webapp-url }}"
           else
             WEBAPP_URL="${{ secrets.AZURE_DOCKER_WEBAPP_URL }}"
           fi
           echo "WEBAPP_URL=$WEBAPP_URL" >> $GITHUB_ENV
 
-      - name: Smoke test (check Hello World)
-        run: |
-          echo "URL testée : $WEBAPP_URL"
-          
-          sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
-          
-          RESPONSE=$(curl -s $WEBAPP_URL)
-          echo "Response: $RESPONSE"
+          # Retry automatique
+          for i in {1..5}; do
+            RESPONSE=$(curl -s $WEBAPP_URL || true)
+            echo "Tentative $i : $RESPONSE"
+            if [[ "$RESPONSE" == *"Hello World!"* ]]; then
+              echo "✅ Déploiement $TARGET_TYPE réussi"
+              exit 0
+            fi
+            sleep 10
+          done
 
-          if [[ "$RESPONSE" == *"Hello World!"* ]]; then
-            echo "✅ Déploiement ${matrix.target} réussi, Hello World trouvé"
-            exit 0
-          else
-            echo "❌ Déploiement ${matrix.target} échoué, Hello World non trouvé"
-            exit 1
-          fi
+          echo "❌ Déploiement $TARGET_TYPE échoué"
+          exit 1
