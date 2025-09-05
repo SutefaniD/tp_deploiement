@@ -91,7 +91,7 @@ jobs:
       - name: Smoke test (check Hello World)
         run: |
           sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
-          RESPONSE=$(curl -s https://https://webapi-stephanie-fuejh7hth3fucudu.spaincentral-01.azurewebsites.net)
+          RESPONSE=$(curl -s https://webapi-stephanie-fuejh7hth3fucudu.spaincentral-01.azurewebsites.net)
           echo "Response: $RESPONSE"
 
           if [[ "$RESPONSE" == *"Hello World!"* ]]; then
