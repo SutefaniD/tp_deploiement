@@ -66,10 +66,11 @@ jobs:
       contents: none
     runs-on: ubuntu-latest
     needs: test
-    environment:
-      name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
+    #environment:
+    #  name: 'Development'
+    #  url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    outputs: 
+      webapp-url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -90,8 +91,12 @@ jobs:
     steps:
       - name: Smoke test (check Hello World)
         run: |
+          WEBAPP_URL = "${{ needs.deploy-as-binary.outputs.webapp-url }}"
+          echo "URL utilisée pour le test: $WEBAPP_URL"
+          
           sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
-          RESPONSE=$(curl -s https://webapi-stephanie-fuejh7hth3fucudu.spaincentral-01.azurewebsites.net)
+          
+          RESPONSE=$(curl -s $WEBAPP_URL)
           echo "Response: $RESPONSE"
 
           if [[ "$RESPONSE" == *"Hello World!"* ]]; then
