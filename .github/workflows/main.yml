@@ -66,9 +66,6 @@ jobs:
       contents: none
     runs-on: ubuntu-latest
     needs: test
-    #environment:
-    #  name: 'Development'
-    #  url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     outputs: 
       webapp-url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     steps:
@@ -91,7 +88,7 @@ jobs:
     steps:
       - name: Smoke test (check Hello World)
         run: |
-          WEBAPP_URL = "${{ needs.deploy-as-binary.outputs.webapp-url }}"
+          WEBAPP_URL="${{ needs.deploy-as-binary.outputs.webapp-url }}"
           echo "URL utilisée pour le test: $WEBAPP_URL"
           
           sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
