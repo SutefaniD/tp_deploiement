@@ -81,27 +81,7 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-      
-  smoke-test-binary:
-    runs-on: ubuntu-latest
-    needs: deploy-as-binary
-    steps:
-      - name: Smoke test (check Hello World)
-        run: |
-          WEBAPP_URL="${{ needs.deploy-as-binary.outputs.webapp-url }}"
-          echo "URL utilisée pour le test: $WEBAPP_URL"
-          
-          sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
-          
-          RESPONSE=$(curl -s $WEBAPP_URL)
-          echo "Response: $RESPONSE"
-
-          if [[ "$RESPONSE" == *"Hello World!"* ]]; then
-            echo "✅ Déploiement réussi, Hello World trouvé"
-          else
-            echo "❌ Déploiement échoué, Hello World non trouvé"
-            exit 1
-          fi
+  
 
   deploy-as-docker:
     runs-on: ubuntu-latest
@@ -124,16 +104,24 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/webapi-demo:latest
 
-  smoke-test-docker:
+  smoke-test:
     runs-on: ubuntu-latest
-    needs: deploy-as-docker
-    env:
-      AZURE_DOCKER_WEBAPP_URL: ${{ secrets.AZURE_DOCKER_WEBAPP_URL }}
+    needs: [deploy-as-binary, deploy-as-docker]
+    strategy:
+      matrix:
+        target-url: [
+          ${{ needs.deploy-as-binary.outputs.webapp-url }},
+          ${{ secrets.AZURE_DOCKER_WEBAPP_URL }}
+        ]
+
     steps:
       - name: Smoke test (check Hello World)
         run: |
+          echo "URL testée : ${{ matrix.target-url }}"
+          
           sleep 15  # On attend quelques secondes pour laisser Azure démarrer l'app
-          RESPONSE=$(curl -s https://$AZURE_DOCKER_WEBAPP_URL)
+          
+          RESPONSE=$(curl -s ${{ matrix.target-url }})
           echo "Response: $RESPONSE"
 
           if [[ "$RESPONSE" == *"Hello World!"* ]]; then
