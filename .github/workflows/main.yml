@@ -104,36 +104,42 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/webapi-demo:latest
 
-  smoke-test:
+  smoke-test-binary:
     runs-on: ubuntu-latest
-    needs: [deploy-as-binary, deploy-as-docker]
-    strategy:
-      matrix:
-        target: ["binary", "docker"]
-    env:
-      TARGET_TYPE: ${{ matrix.target }}
-
+    needs: deploy-as-binary
     steps:
-      - name: Smoke test (check Hello World)
+      - name: Smoke test binaire
         run: |
-          # Déterminer l'URL selon le type
-          if [[ $TARGET_TYPE == "binary" ]]; then 
-            WEBAPP_URL="${{ needs.deploy-as-binary.outputs.webapp-url }}"
-          else
-            WEBAPP_URL="${{ secrets.AZURE_DOCKER_WEBAPP_URL }}"
-          fi
-          echo "WEBAPP_URL=$WEBAPP_URL" >> $GITHUB_ENV
-
-          # Retry automatique
+          WEBAPP_URL="${{ needs.deploy-as-binary.outputs.webapp-url }}"
+          echo "URL testée : $WEBAPP_URL"
           for i in {1..5}; do
             RESPONSE=$(curl -s $WEBAPP_URL || true)
             echo "Tentative $i : $RESPONSE"
             if [[ "$RESPONSE" == *"Hello World!"* ]]; then
-              echo "✅ Déploiement $TARGET_TYPE réussi"
+              echo "✅ Déploiement binaire réussi"
               exit 0
             fi
             sleep 10
           done
+          echo "❌ Déploiement binaire échoué"
+          exit 1
 
-          echo "❌ Déploiement $TARGET_TYPE échoué"
+  smoke-test-docker:
+    runs-on: ubuntu-latest
+    needs: deploy-as-docker
+    steps:
+      - name: Smoke test Docker
+        run: |
+          WEBAPP_URL="${{ secrets.AZURE_DOCKER_WEBAPP_URL }}"
+          echo "URL testée : $WEBAPP_URL"
+          for i in {1..5}; do
+            RESPONSE=$(curl -s $WEBAPP_URL || true)
+            echo "Tentative $i : $RESPONSE"
+            if [[ "$RESPONSE" == *"Hello World!"* ]]; then
+              echo "✅ Déploiement Docker réussi"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "❌ Déploiement Docker échoué"
           exit 1
